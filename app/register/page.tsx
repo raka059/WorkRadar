@@ -2,36 +2,42 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-export default function Home() {
-  const [showPassword, setShowPassword] = useState(false);
+export default function Register() {
   const [formData, setFormData] = useState({
+    nama: '',
     email: '',
     password: '',
-    rememberMe: false,
+    confirmPassword: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login:', formData);
-    alert('Login berhasil!');
-  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value,
-    });
+    if (formData.password !== formData.confirmPassword) {
+      alert('Password dan konfirmasi password tidak sama!');
+      return;
+    }
+
+    console.log('Data registrasi:', formData);
+    alert('Pendaftaran berhasil!');
   };
 
   return (
     <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4">
       {/* Background Radar */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950">
-        {/* Radar circles */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <div className="relative w-96 h-96">
-            {/* Radar sweep animation */}
+            {/* Radar sweep */}
             <div
               className="absolute inset-0 animate-spin rounded-full"
               style={{
@@ -41,7 +47,7 @@ export default function Home() {
               }}
             ></div>
 
-            {/* Concentric circles */}
+            {/* Circles */}
             {[0, 8, 16, 24].map((v) => (
               <div
                 key={v}
@@ -52,7 +58,7 @@ export default function Home() {
             {/* Center dot */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-blue-400 rounded-full shadow-lg shadow-blue-400/50"></div>
 
-            {/* Grid lines */}
+            {/* Cross lines */}
             <div className="absolute top-0 left-1/2 w-px h-full bg-blue-400/20 transform -translate-x-1/2"></div>
             <div className="absolute top-1/2 left-0 w-full h-px bg-blue-400/20 transform -translate-y-1/2"></div>
           </div>
@@ -64,7 +70,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Login Form */}
+      {/* Register Form */}
       <div className="relative z-10 w-full max-w-md">
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl border border-blue-300/20 overflow-hidden">
           {/* Header */}
@@ -80,51 +86,47 @@ export default function Home() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  d="M12 4v16m8-8H4"
                 />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">Sistem Login</h1>
-            <p className="text-blue-100">Masukkan kredensial Anda</p>
+            <h1 className="text-3xl font-bold text-white mb-2">Daftar Akun</h1>
+            <p className="text-blue-100">Silakan isi data Anda</p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
+            {/* Nama */}
+            <div>
+              <label className="block text-sm font-medium text-blue-100 mb-2">Nama Lengkap</label>
+              <input
+                type="text"
+                name="nama"
+                value={formData.nama}
+                onChange={handleChange}
+                className="w-full pl-4 pr-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-white placeholder-blue-300/50"
+                placeholder="Masukkan nama lengkap"
+                required
+              />
+            </div>
+
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-blue-100 mb-2">
-                Email / Username
-              </label>
-              <div className="relative">
-                <svg
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-300 w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-                <input
-                  type="text"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-white placeholder-blue-300/50"
-                  placeholder="Masukkan email atau username"
-                />
-              </div>
+              <label className="block text-sm font-medium text-blue-100 mb-2">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full pl-4 pr-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-white placeholder-blue-300/50"
+                placeholder="Masukkan email"
+                required
+              />
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-blue-100 mb-2">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-blue-100 mb-2">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -133,6 +135,7 @@ export default function Home() {
                   onChange={handleChange}
                   className="w-full pl-4 pr-12 py-3 bg-white/10 border border-blue-300/30 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-white placeholder-blue-300/50"
                   placeholder="Masukkan password"
+                  required
                 />
                 <button
                   type="button"
@@ -144,42 +147,38 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Remember Me */}
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="rememberMe"
-                  checked={formData.rememberMe}
-                  onChange={handleChange}
-                  className="w-4 h-4 text-blue-600 bg-white/10 border-blue-300/30 rounded"
-                />
-                <span className="ml-2 text-blue-100">Ingat saya</span>
+            {/* Konfirmasi Password */}
+            <div>
+              <label className="block text-sm font-medium text-blue-100 mb-2">
+                Konfirmasi Password
               </label>
-              <button
-                type="button"
-                className="text-blue-300 hover:text-blue-100 font-medium"
-              >
-                Lupa password?
-              </button>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="w-full pl-4 pr-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-white placeholder-blue-300/50"
+                placeholder="Ulangi password"
+                required
+              />
             </div>
 
-            {/* Submit */}
+            {/* Tombol Submit */}
             <button
               type="submit"
               className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-800 transform hover:scale-105 transition"
             >
-              Login
+              Daftar
             </button>
 
-            {/* Register Link */}
+            {/* Link ke Login */}
             <p className="text-center text-blue-200 text-sm mt-4">
-              Belum punya akun?{' '}
+              Sudah punya akun?{' '}
               <Link
-                href="/register"
+                href="/"
                 className="text-blue-400 hover:text-blue-100 underline font-medium"
               >
-                Daftar di sini
+                Masuk di sini
               </Link>
             </p>
           </form>
@@ -191,7 +190,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Animasi CSS */}
+      {/* Animasi Radar */}
       <style jsx global>{`
         @keyframes scan {
           0% {
