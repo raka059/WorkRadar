@@ -1,76 +1,42 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function Register() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
-    nama: '',
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      alert('Password dan konfirmasi password tidak sama!');
+      alert('Password tidak cocok!');
       return;
     }
 
-    console.log('Data registrasi:', formData);
-    alert('Pendaftaran berhasil!');
+    console.log('Register:', formData);
+    alert('Registrasi berhasil!');
+    router.push('/'); // kembali ke halaman login
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   return (
     <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-4">
-      {/* Background Radar */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950">
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <div className="relative w-96 h-96">
-            {/* Radar sweep */}
-            <div
-              className="absolute inset-0 animate-spin rounded-full"
-              style={{
-                animationDuration: '4s',
-                background:
-                  'conic-gradient(from 0deg, transparent, rgba(96,165,250,0.3), transparent)',
-              }}
-            ></div>
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950"></div>
 
-            {/* Circles */}
-            {[0, 8, 16, 24].map((v) => (
-              <div
-                key={v}
-                className={`absolute inset-${v} rounded-full border-2 border-blue-400/20`}
-              ></div>
-            ))}
-
-            {/* Center dot */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-blue-400 rounded-full shadow-lg shadow-blue-400/50"></div>
-
-            {/* Cross lines */}
-            <div className="absolute top-0 left-1/2 w-px h-full bg-blue-400/20 transform -translate-x-1/2"></div>
-            <div className="absolute top-1/2 left-0 w-full h-px bg-blue-400/20 transform -translate-y-1/2"></div>
-          </div>
-        </div>
-
-        {/* Scan line */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute w-full h-1 bg-gradient-to-r from-transparent via-blue-400/40 to-transparent animate-scan"></div>
-        </div>
-      </div>
-
-      {/* Register Form */}
+      {/* Form Card */}
       <div className="relative z-10 w-full max-w-md">
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl border border-blue-300/20 overflow-hidden">
           {/* Header */}
@@ -90,43 +56,44 @@ export default function Register() {
                 />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">Daftar Akun</h1>
-            <p className="text-blue-100">Silakan isi data Anda</p>
+            <h1 className="text-3xl font-bold text-white mb-2">Buat Akun Baru</h1>
+            <p className="text-blue-100">Isi data Anda untuk mendaftar</p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
-            {/* Nama */}
             <div>
-              <label className="block text-sm font-medium text-blue-100 mb-2">Nama Lengkap</label>
+              <label className="block text-sm font-medium text-blue-100 mb-2">
+                Nama Lengkap
+              </label>
               <input
                 type="text"
-                name="nama"
-                value={formData.nama}
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
-                className="w-full pl-4 pr-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-white placeholder-blue-300/50"
+                className="w-full px-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-white placeholder-blue-300/50"
                 placeholder="Masukkan nama lengkap"
-                required
               />
             </div>
 
-            {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-blue-100 mb-2">Email</label>
+              <label className="block text-sm font-medium text-blue-100 mb-2">
+                Email
+              </label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full pl-4 pr-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-white placeholder-blue-300/50"
+                className="w-full px-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-white placeholder-blue-300/50"
                 placeholder="Masukkan email"
-                required
               />
             </div>
 
-            {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-blue-100 mb-2">Password</label>
+              <label className="block text-sm font-medium text-blue-100 mb-2">
+                Password
+              </label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -135,7 +102,6 @@ export default function Register() {
                   onChange={handleChange}
                   className="w-full pl-4 pr-12 py-3 bg-white/10 border border-blue-300/30 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-white placeholder-blue-300/50"
                   placeholder="Masukkan password"
-                  required
                 />
                 <button
                   type="button"
@@ -147,7 +113,6 @@ export default function Register() {
               </div>
             </div>
 
-            {/* Konfirmasi Password */}
             <div>
               <label className="block text-sm font-medium text-blue-100 mb-2">
                 Konfirmasi Password
@@ -157,13 +122,11 @@ export default function Register() {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="w-full pl-4 pr-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-white placeholder-blue-300/50"
+                className="w-full px-4 py-3 bg-white/10 border border-blue-300/30 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none text-white placeholder-blue-300/50"
                 placeholder="Ulangi password"
-                required
               />
             </div>
 
-            {/* Tombol Submit */}
             <button
               type="submit"
               className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-800 transform hover:scale-105 transition"
@@ -171,14 +134,13 @@ export default function Register() {
               Daftar
             </button>
 
-            {/* Link ke Login */}
             <p className="text-center text-blue-200 text-sm mt-4">
               Sudah punya akun?{' '}
               <Link
                 href="/"
                 className="text-blue-400 hover:text-blue-100 underline font-medium"
               >
-                Masuk di sini
+                Login di sini
               </Link>
             </p>
           </form>
@@ -189,21 +151,6 @@ export default function Register() {
           </div>
         </div>
       </div>
-
-      {/* Animasi Radar */}
-      <style jsx global>{`
-        @keyframes scan {
-          0% {
-            top: 0;
-          }
-          100% {
-            top: 100%;
-          }
-        }
-        .animate-scan {
-          animation: scan 3s linear infinite;
-        }
-      `}</style>
     </div>
   );
 }
