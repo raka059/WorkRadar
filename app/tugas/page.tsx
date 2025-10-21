@@ -50,6 +50,10 @@ export default function TugasPage() {
     setTugasList((prev) => prev.filter((t) => t.id !== id));
   }
 
+  function handleMarkDone(id: number) {
+    setTugasList(prev => prev.map(t => t.id === id ? { ...t, status: 'Selesai', completedAt: new Date().toISOString() } : t));
+  }
+
   return (
     <main className="min-h-screen bg-gray-50 p-8">
       <h1 className="text-3xl font-bold mb-6 text-blue-700">Mengelola Tugas</h1>
@@ -105,7 +109,10 @@ export default function TugasPage() {
                 <td className="p-3">{tugas.prioritas || '-'}</td>
                 <td className="p-3 text-center">
                   <button className="text-sm bg-yellow-300 px-2 py-1 rounded mr-2" onClick={() => handleEdit(tugas)}>Edit</button>
-                  <button className="text-sm bg-red-500 text-white px-2 py-1 rounded" onClick={() => handleDelete(tugas.id)}>Hapus</button>
+                  <button className="text-sm bg-red-500 text-white px-2 py-1 rounded mr-2" onClick={() => handleDelete(tugas.id)}>Hapus</button>
+                  {tugas.status !== 'Selesai' && (
+                    <button className="text-sm bg-green-500 text-white px-2 py-1 rounded" onClick={() => handleMarkDone(tugas.id)}>Tandai Selesai</button>
+                  )}
                 </td>
               </tr>
             ))}

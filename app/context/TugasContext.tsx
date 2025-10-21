@@ -6,11 +6,13 @@ export type Tugas = {
   judul: string;
   status: "Belum selesai" | "Selesai" | "Sedang dikerjakan" | "Terlambat";
   deadline?: string;
+  completedAt?: string; // ISO timestamp ketika tugas ditandai selesai
   prioritas?: "Tinggi" | "Sedang" | "Rendah";
 };
 
 const defaultTugas: Tugas[] = [
   { id: 1, judul: "Membuat laporan mingguan", status: "Belum selesai", deadline: "2025-10-20", prioritas: "Tinggi" },
+  // completedAt dihilangkan agar modul ini deterministik (tidak memanggil new Date() saat dimuat)
   { id: 2, judul: "Review project client", status: "Selesai", deadline: "2025-10-21", prioritas: "Sedang" },
   { id: 3, judul: "Meeting tim", status: "Belum selesai", deadline: "2025-10-22", prioritas: "Rendah" },
 ];
