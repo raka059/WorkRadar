@@ -65,74 +65,160 @@ export default function AnalitikPage() {
   const priSedang = tugasList.filter(t => t.prioritas === 'Sedang').length;
   const priRendah = tugasList.filter(t => t.prioritas === 'Rendah').length;
 
+  // compute percent complete
+  const percent = total > 0 ? Math.round((selesai / total) * 100) : 0;
+
+  // prepare pie data (status distribution)
+  const statusCounts = [
+    tugasList.filter(t => t.status === 'Belum selesai').length,
+    sedang,
+    selesai,
+    terlambat,
+  ];
+
+  // weekly trend: compute simple 4-week buckets by completedAt date
+  const weeks = [0, 0, 0, 0];
+  const now = new Date();
+  tugasList.forEach(t => {
+    if (!t.completedAt) return;
+    const d = new Date(t.completedAt);
+    const diffDays = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
+    const weekIndex = Math.floor(diffDays / 7);
+    if (weekIndex >= 0 && weekIndex < 4) weeks[3 - weekIndex] += 1; // recent week at right
+  });
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6 text-blue-700">Analitik</h1>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 className="text-3xl font-bold mb-2">Analitik Tugas</h1>
+      <p className="text-gray-500 mb-6">Pantau produktivitas dan progres tugas Anda</p>
 
-      <div className="bg-white p-4 rounded shadow mb-6">
-        <div className="flex gap-4 items-end">
-          <div>
-            <label className="text-sm text-gray-600">Dari</label>
-            <input type="date" value={from} onChange={e => setFrom(e.target.value)} className="block border px-2 py-1 rounded" />
-          </div>
-          <div>
-            <label className="text-sm text-gray-600">Sampai</label>
-            <input type="date" value={to} onChange={e => setTo(e.target.value)} className="block border px-2 py-1 rounded" />
-          </div>
-          <div>
-            <label className="text-sm text-gray-600">Waktu</label>
-            <select value={timeOfDay} onChange={e => setTimeOfDay(e.target.value as any)} className="block border px-2 py-1 rounded">
-              <option value="all">Semua</option>
-              <option value="pagi">Pagi (05-11)</option>
-              <option value="siang">Siang (11-15)</option>
-              <option value="sore">Sore (15-19)</option>
-              <option value="malam">Malam (19-05)</option>
-            </select>
-          </div>
-          <div className="ml-auto text-sm text-gray-600">Hasil filter (tugas selesai): {filtered.length}</div>
+      {/* stat cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div className="bg-white rounded-lg p-6 shadow border">
+          <p className="text-sm text-gray-500">Total Tugas</p>
+          <h3 className="text-2xl font-bold mt-2">{total}</h3>
+          <p className="text-xs text-gray-400 mt-2">Semua tugas yang ada</p>
+        </div>
+
+        <div className="bg-white rounded-lg p-6 shadow border">
+          <p className="text-sm text-gray-500">Tugas Selesai</p>
+          <h3 className="text-2xl font-bold text-green-600 mt-2">{selesai}</h3>
+          <p className="text-xs text-gray-400 mt-2">{total ? ((selesai/total)*100).toFixed(1) : 0}% dari total</p>
+        </div>
+
+        <div className="bg-white rounded-lg p-6 shadow border">
+          <p className="text-sm text-gray-500">Sedang Dikerjakan</p>
+          <h3 className="text-2xl font-bold text-orange-600 mt-2">{sedang}</h3>
+          <p className="text-xs text-gray-400 mt-2">Tugas dalam progres</p>
+        </div>
+
+        <div className="bg-white rounded-lg p-6 shadow border">
+          <p className="text-sm text-gray-500">Tugas Terlambat</p>
+          <h3 className="text-2xl font-bold text-red-600 mt-2">{terlambat}</h3>
+          <p className="text-xs text-gray-400 mt-2">Perlu perhatian segera</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6 mb-6">
-        <div className="bg-white p-4 rounded shadow text-center">
-          <p className="text-gray-500">Total Tugas</p>
-          <p className="text-2xl font-bold">{total}</p>
-        </div>
-        <div className="bg-white p-4 rounded shadow text-center">
-          <p className="text-gray-500">Selesai</p>
-          <p className="text-2xl font-bold text-green-500">{selesai}</p>
-        </div>
-        <div className="bg-white p-4 rounded shadow text-center">
-          <p className="text-gray-500">Sedang Dikerjakan</p>
-          <p className="text-2xl font-bold text-blue-500">{sedang}</p>
+      {/* progress card */}
+      <div className="bg-white rounded-lg p-6 shadow border mb-6">
+        <h3 className="text-lg font-semibold">Progres Keseluruhan</h3>
+        <p className="text-sm text-gray-500">Tingkat penyelesaian tugas secara keseluruhan</p>
+
+        <div className="mt-6">
+          <div className="w-full bg-gray-100 h-4 rounded-full overflow-hidden">
+            <div className="h-4 bg-blue-500" style={{ width: `${percent}%` }} />
+          </div>
+          <div className="flex justify-between text-xs text-gray-500 mt-2">
+            <span>0%</span>
+            <span>{percent.toFixed(1)}%</span>
+            <span>100%</span>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
-        <SimpleBar data={[priTinggi, priSedang, priRendah]} labels={["Tinggi", "Sedang", "Rendah"]} />
-        <SimpleBar data={[selesai, sedang, terlambat]} labels={["Selesai", "Sedang", "Terlambat"]} />
+      {/* distribution charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* pie */}
+        <div className="bg-white rounded-lg p-6 shadow border">
+          <h3 className="text-lg font-semibold mb-2">Distribusi Status Tugas</h3>
+          <p className="text-sm text-gray-500 mb-4">Pembagian tugas berdasarkan status</p>
+          <div className="flex items-center justify-center">
+            <svg width="220" height="160" viewBox="0 0 220 160">
+              {/** draw pie based on statusCounts **/}
+              {
+                (() => {
+                  const totalS = statusCounts.reduce((a,b)=>a+b,0) || 1;
+                  let angleStart = -Math.PI/2;
+                  const cx = 110, cy = 80, r=60;
+                  const colors = ['#6b7280','#3b82f6','#10b981','#ef4444'];
+                  return statusCounts.map((c, idx) => {
+                    const angle = (c/totalS) * Math.PI * 2;
+                    const x1 = cx + r * Math.cos(angleStart);
+                    const y1 = cy + r * Math.sin(angleStart);
+                    angleStart += angle;
+                    const x2 = cx + r * Math.cos(angleStart);
+                    const y2 = cy + r * Math.sin(angleStart);
+                    const large = angle > Math.PI ? 1 : 0;
+                    const d = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
+                    return <path key={idx} d={d} fill={colors[idx]} stroke="#fff" />;
+                  })
+                })()
+              }
+            </svg>
+          </div>
+        </div>
+
+        {/* priorities bar */}
+        <div className="bg-white rounded-lg p-6 shadow border">
+          <h3 className="text-lg font-semibold mb-2">Distribusi Prioritas</h3>
+          <p className="text-sm text-gray-500 mb-4">Pembagian tugas berdasarkan tingkat prioritas</p>
+          <div className="grid grid-cols-3 gap-4 items-end h-40">
+            <div className="flex flex-col items-center">
+              <div className="w-16 bg-blue-500 rounded-t" style={{ height: `${(priTinggi || 0) * 24}px` }}></div>
+              <div className="mt-2 text-sm">Tinggi</div>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="w-16 bg-blue-500 rounded-t" style={{ height: `${(priSedang || 0) * 24}px` }}></div>
+              <div className="mt-2 text-sm">Sedang</div>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="w-16 bg-blue-500 rounded-t" style={{ height: `${(priRendah || 0) * 24}px` }}></div>
+              <div className="mt-2 text-sm">Rendah</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="mt-6 bg-white p-4 rounded shadow">
-        <h2 className="text-lg font-semibold mb-2">Daftar Tugas (Selesai dan sesuai filter)</h2>
-        <table className="w-full table-auto">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="p-2 text-left">Judul</th>
-              <th className="p-2 text-left">Selesai Pada</th>
-              <th className="p-2 text-left">Prioritas</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map(t => (
-              <tr key={t.id} className="border-t">
-                <td className="p-2">{t.judul}</td>
-                <td className="p-2">{new Date(t.completedAt || '').toLocaleString()}</td>
-                <td className="p-2">{t.prioritas || '-'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* weekly trend */}
+      <div className="bg-white rounded-lg p-6 shadow border mb-6">
+        <h3 className="text-lg font-semibold mb-2">Tren Penyelesaian Mingguan</h3>
+        <p className="text-sm text-gray-500 mb-4">Progres penyelesaian tugas dalam 4 minggu terakhir</p>
+        <div className="w-full h-56 flex items-end gap-6">
+          {weeks.map((v,i)=> (
+            <div key={i} className="flex-1 flex flex-col items-center">
+              <div className="w-full bg-gray-200 rounded-t" style={{ height: `${v * 18 + 8}px` }}></div>
+              <div className="mt-3 text-sm text-gray-600">Minggu {i+1}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* insight quick */}
+      <div className="bg-white rounded-lg p-6 shadow border">
+        <h3 className="text-xl font-semibold">Insight Cepat</h3>
+        <p className="text-gray-500">Ringkasan dan rekomendasi berdasarkan data tugas</p>
+
+        <div className="mt-6 bg-blue-50 p-4 rounded">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-white rounded-full">
+              <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#1e40af" d="M12 2L12 12 20 14"/></svg>
+            </div>
+            <div>
+              <div className="font-medium text-blue-700">Banyak tugas sedang dikerjakan</div>
+              <div className="text-sm text-blue-700/80">Fokus menyelesaikan tugas yang sudah dimulai sebelum mengambil tugas baru</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

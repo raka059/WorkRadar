@@ -20,6 +20,9 @@ const defaultTugas: Tugas[] = [
 const TugasContext = createContext<{
   tugasList: Tugas[];
   setTugasList: React.Dispatch<React.SetStateAction<Tugas[]>>;
+  addTugas: (t: Omit<Tugas, 'id' | 'completedAt'>) => void;
+  updateTugas: (id: number, patch: Partial<Tugas>) => void;
+  deleteTugas: (id: number) => void;
 } | undefined>(undefined);
 
 export function useTugas() {
@@ -29,9 +32,40 @@ export function useTugas() {
 }
 
 export function TugasProvider({ children }: { children: ReactNode }) {
-  const [tugasList, setTugasList] = useState<Tugas[]>(defaultTugas);
+  const [tugasList, setTugasList] = useState<Tugas[]>(() => {
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('tugas') : null;
+      if (raw) return JSON.parse(raw) as Tugas[];
+    } catch (e) {
+      // ignore
+    }
+    return defaultTugas;
+  });
+
+  // persist
+  React.useEffect(() => {
+    try {
+      localStorage.setItem('tugas', JSON.stringify(tugasList));
+    } catch (e) {
+      // ignore
+    }
+  }, [tugasList]);
+
+  function addTugas(t: Omit<Tugas, 'id' | 'completedAt'>) {
+    const next: Tugas = { ...t, id: Date.now(), completedAt: undefined };
+    setTugasList((prev) => [...prev, next]);
+  }
+
+  function updateTugas(id: number, patch: Partial<Tugas>) {
+    setTugasList((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
+  }
+
+  function deleteTugas(id: number) {
+    setTugasList((prev) => prev.filter((t) => t.id !== id));
+  }
+
   return (
-    <TugasContext.Provider value={{ tugasList, setTugasList }}>
+    <TugasContext.Provider value={{ tugasList, setTugasList, addTugas, updateTugas, deleteTugas }}>
       {children}
     </TugasContext.Provider>
   );

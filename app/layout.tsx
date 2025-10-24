@@ -1,7 +1,7 @@
 import './globals.css';
 import Link from 'next/link';
 import { TugasProvider } from "./context/TugasContext";
-import Sidebar from './components/Sidebar';
+import Navbar from './components/Navbar';
 
 export const metadata = {
   title: 'WorkRadar',
@@ -13,8 +13,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="id">
       <body>
         <TugasProvider>
-          <div className="flex min-h-screen bg-gray-50 text-gray-900">
-            <Sidebar />
+          <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900">
+            <Navbar />
             {/* Main content (pages render here) */}
             <main className="flex-1">{children}</main>
           </div>
